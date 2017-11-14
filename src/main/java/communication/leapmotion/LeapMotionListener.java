@@ -2,7 +2,6 @@ package communication.leapmotion;
 
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
-import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.Listener;
 
 import controller.HandController;
@@ -17,17 +16,24 @@ public class LeapMotionListener extends Listener {
 		handData = new LeapMotionData();
 	}
 	
+	@Override
 	public void onConnect(Controller controller) {
-        System.out.println("Connected");
-    }
-
+		//TODO
+	}
+	
+	@Override
     public void onFrame(Controller controller) {
     	Frame frame = controller.frame();
     	if(!frame.hands().isEmpty()) {
     		LeapMotionData newData = new LeapMotionData(frame.hands().get(0));
     		if(handData.checkForDifference(newData, handController.getTolerance())) {
-    			handController.receiveData();
+    			handController.receiveData(newData);
     		}
     	}
     }
+	
+	@Override
+	public void onDisconnect(Controller controller) {
+		//TODO
+	}
 }

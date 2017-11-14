@@ -1,5 +1,11 @@
 package view;
 
-public class DiagnosticView {
+import javax.swing.JFrame;
 
+public class DiagnosticView extends JFrame{
+	
+	public DiagnosticView() {
+		
+	}
+	
 }
