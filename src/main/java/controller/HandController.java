@@ -8,6 +8,7 @@ import communication.leapmotion.LeapMotionConnection;
 import communication.leapmotion.LeapMotionData;
 import communication.serial.HandConnection;
 import communication.serial.SerialConnection;
+import communication.serial.SerialData;
 
 public class HandController implements Runnable{
 	private float tolerance;
@@ -15,11 +16,15 @@ public class HandController implements Runnable{
 	private HandConnection serial;
 	private LeapMotionConnection leapMotion;
 	private GloveConnection glove;
+	private boolean close;
+	private Object semafor;
 	
 	public HandController() {
-		this.tolerance = 0.05f;
+		this.tolerance = 0.15f;
 		leapMotionInput = new ArrayBlockingQueue<LeapMotionData>(50);
 		leapMotion = new LeapMotionConnection(this);
+		close = false;
+		semafor = new Object();
 	}
 	
 	public synchronized float getTolerance() {
@@ -30,29 +35,45 @@ public class HandController implements Runnable{
 		 this.tolerance = tolerance;
 	 }
 
-	public synchronized void receiveData(LeapMotionData data) {
-		try {
-			leapMotionInput.offer(data, 50, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void run() {
-		
-		while(true) {
-			if(!leapMotionInput.isEmpty()) {
-				if(serial.checkReady()) {
-					serial.send(leapMotionInput.take());
-				}
-			}
-			
+	public void receiveData(LeapMotionData data) {
+		synchronized (semafor) {
 			try {
-				this.wait();
+				leapMotionInput.offer(data, 50, TimeUnit.MILLISECONDS);
+				semafor.notify();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		leapMotion.notify();
+	}
+
+	public void run() {
+		Thread leap = new Thread(leapMotion);
+		leap.start();
+		while(!close) {
+			if(!leapMotionInput.isEmpty()) {
+				if(true/*serial.checkReady()*/) {
+					try {
+						System.out.println(leapMotionInput.take());
+//						SerialData data = new SerialData(leapMotionInput.take());
+//						serial.send(data);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			synchronized (semafor) {
+				try {
+					semafor.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		leapMotion.stop();
+	}
+	
+	public static void main(String[] args) {
+		HandController controller = new HandController();
+		controller.run();
 	}
 }

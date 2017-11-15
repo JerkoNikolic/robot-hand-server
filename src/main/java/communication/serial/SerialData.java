@@ -31,7 +31,6 @@ public class SerialData {
 	
 	public String toString() {
 		String data = "";
-		Integer motorPosition;
 		for(int i = 0; i<5; i++) {
 			if(baseMotorPosition.get(i)!=null && tipMotorPosition.get(i)!=null) {
 				data += "i" + i + "b" + baseMotorPosition.get(i).toString() + "t" + tipMotorPosition.get(i).toString();

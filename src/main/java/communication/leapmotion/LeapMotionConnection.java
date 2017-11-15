@@ -12,15 +12,19 @@ public class LeapMotionConnection implements Runnable {
 		this.handController = handController;
 	}
 
-	public void run() {
+	public synchronized void run() {
 		LeapMotionListener listener = new LeapMotionListener(this.handController);
 		Controller controller = new Controller();
-		controller.addListener(listener);
+		controller.addListener(listener);	
+		System.out.println("LeapMotionConnection started");
 		try {
 			this.wait();
 		} catch (InterruptedException e) {
 			controller.removeListener(listener);
 		}
-		
+	}
+	
+	public void stop() {
+		this.notify();
 	}
 }

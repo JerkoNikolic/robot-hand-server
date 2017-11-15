@@ -16,10 +16,6 @@ public class LeapMotionListener extends Listener {
 		handData = new LeapMotionData();
 	}
 	
-	@Override
-	public void onConnect(Controller controller) {
-		//TODO
-	}
 	
 	@Override
     public void onFrame(Controller controller) {
@@ -27,7 +23,10 @@ public class LeapMotionListener extends Listener {
     	if(!frame.hands().isEmpty()) {
     		LeapMotionData newData = new LeapMotionData(frame.hands().get(0));
     		if(handData.checkForDifference(newData, handController.getTolerance())) {
-    			handController.receiveData(newData);
+    			synchronized (controller) {
+					handData = newData;
+					handController.receiveData(newData);
+				}
     		}
     	}
     }

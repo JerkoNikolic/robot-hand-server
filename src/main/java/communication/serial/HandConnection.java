@@ -2,14 +2,17 @@ package communication.serial;
 
 import java.io.IOException;
 
+import controller.HandController;
 import gnu.io.SerialPortEvent;
 
 public class HandConnection extends SerialConnection {
+	protected HandController controller;
 	protected boolean writeFlag; 	//set to false to block additional data until
 									//the movement is performed
-	public HandConnection(String portName) {
+	public HandConnection(String portName, HandController controller) {
 		super(portName);
 		writeFlag = true;
+		this.controller = controller;
 	}
 	
 	
@@ -19,6 +22,7 @@ public class HandConnection extends SerialConnection {
 				String inputLine=input.readLine();
 				if(inputLine.equals("r")) {
 					this.writeFlag=true;
+					this.controller.notify();
 				}
 			} catch (Exception e) {
 				System.out.println("Error receiving serial data");
@@ -36,6 +40,10 @@ public class HandConnection extends SerialConnection {
 			System.out.println("Serial send error");
 			e.printStackTrace();
 		}
+	}
+	
+	public void send(SerialData data) {
+		this.send(data.toString());
 	}
 
 
