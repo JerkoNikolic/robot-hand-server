@@ -7,7 +7,10 @@ import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.Matrix;
 import com.leapmotion.leap.Vector;
 
-public class LeapMotionData {
+import communication.InputData;
+import communication.serial.SerialData;
+
+public class LeapMotionData implements InputData {
 	public ArrayList<Vector> fingerPosition, fingerDirection;
 
 	public LeapMotionData(Hand hand) {
@@ -60,6 +63,11 @@ public class LeapMotionData {
 			s+=fingerPosition.indexOf(v) + ": " +v.getX() + " " + v.getY() + " " + v.getZ() + "\n";
 		}
 		return s;
+	}
+
+	public SerialData getSerialData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -16,7 +16,6 @@ public class LeapMotionListener extends Listener {
 		handData = new LeapMotionData();
 	}
 	
-	
 	@Override
     public void onFrame(Controller controller) {
     	Frame frame = controller.frame();

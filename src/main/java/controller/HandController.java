@@ -3,6 +3,7 @@ package controller;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import communication.InputData;
 import communication.glove.GloveConnection;
 import communication.leapmotion.LeapMotionConnection;
 import communication.leapmotion.LeapMotionData;
@@ -12,7 +13,7 @@ import communication.serial.SerialData;
 
 public class HandController implements Runnable{
 	private float tolerance;
-	private ArrayBlockingQueue<LeapMotionData> leapMotionInput;
+	private ArrayBlockingQueue<InputData> dataInput;
 	private HandConnection serial;
 	private LeapMotionConnection leapMotion;
 	private GloveConnection glove;
@@ -21,7 +22,7 @@ public class HandController implements Runnable{
 	
 	public HandController() {
 		this.tolerance = 0.15f;
-		leapMotionInput = new ArrayBlockingQueue<LeapMotionData>(50);
+		dataInput = new ArrayBlockingQueue<InputData>(50);
 		leapMotion = new LeapMotionConnection(this);
 		close = false;
 		semafor = new Object();
@@ -35,10 +36,10 @@ public class HandController implements Runnable{
 		 this.tolerance = tolerance;
 	 }
 
-	public void receiveData(LeapMotionData data) {
+	public void receiveData(InputData data) {
 		synchronized (semafor) {
 			try {
-				leapMotionInput.offer(data, 50, TimeUnit.MILLISECONDS);
+				dataInput.offer(data, 50, TimeUnit.MILLISECONDS);
 				semafor.notify();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -50,11 +51,11 @@ public class HandController implements Runnable{
 		Thread leap = new Thread(leapMotion);
 		leap.start();
 		while(!close) {
-			if(!leapMotionInput.isEmpty()) {
+			if(!dataInput.isEmpty()) {
 				if(true/*serial.checkReady()*/) {
 					try {
-						System.out.println(leapMotionInput.take());
-//						SerialData data = new SerialData(leapMotionInput.take());
+						System.out.println(dataInput.take());
+//						SerialData data = dataInput.take().getSerialData();
 //						serial.send(data);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
