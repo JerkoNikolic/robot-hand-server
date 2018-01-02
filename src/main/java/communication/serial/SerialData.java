@@ -2,9 +2,6 @@ package communication.serial;
 
 import java.util.HashMap;
 
-import communication.glove.GloveData;
-import communication.leapmotion.LeapMotionData;
-
 public class SerialData {
 	HashMap<Integer, Integer> baseMotorPosition, tipMotorPosition;
 	
@@ -17,16 +14,9 @@ public class SerialData {
 		}
 	}
 	
-	public SerialData(LeapMotionData data) {
-		baseMotorPosition = new HashMap<Integer, Integer>(5);
-		tipMotorPosition = new HashMap<Integer, Integer>(5);
-		// TODO Auto-generated constructor stub
-	}
-	
-	public SerialData(GloveData data) {
-		baseMotorPosition = new HashMap<Integer, Integer>(5);
-		tipMotorPosition = new HashMap<Integer, Integer>(5);
-		// TODO Auto-generated constructor stub
+	public SerialData(HashMap<Integer, Integer> baseMotorPosition, HashMap<Integer, Integer> tipMotorPosition) {
+		this.baseMotorPosition = baseMotorPosition;
+		this.tipMotorPosition = tipMotorPosition;
 	}
 	
 	public String toString() {
