@@ -28,4 +28,14 @@ public class SerialData {
 		}
 		return data + ";";
 	}
+	
+	public byte[] toBytes() {
+		byte[] data = new byte[12];
+		for(int i=1; i<11; i++) {
+			data[i]=this.baseMotorPosition.get(i).byteValue();
+			data[++i]=this.tipMotorPosition.get(i-1).byteValue();
+		}
+		data[11]=(byte) 200;
+		return data;
+	}
 }

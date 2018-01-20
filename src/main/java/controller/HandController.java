@@ -1,40 +1,54 @@
 package controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import communication.InputData;
 import communication.glove.GloveConnection;
 import communication.leapmotion.LeapMotionConnection;
-import communication.leapmotion.LeapMotionData;
 import communication.serial.HandConnection;
-import communication.serial.SerialConnection;
 import communication.serial.SerialData;
 
-public class HandController implements Runnable{
+public class HandController implements Runnable {
 	private float tolerance;
 	private ArrayBlockingQueue<InputData> dataInput;
 	private HandConnection serial;
-	private LeapMotionConnection leapMotion;
+	private Runnable inputConnection;
 	private GloveConnection glove;
 	private boolean close;
 	private Object semafor;
-	
+
 	public HandController() {
 		this.tolerance = 0.15f;
 		dataInput = new ArrayBlockingQueue<InputData>(50);
-		leapMotion = new LeapMotionConnection(this);
+		inputConnection = new LeapMotionConnection(this);
 		close = false;
 		semafor = new Object();
+		serial = new HandConnection("COM7", this);
 	}
 	
+	public HandController(Map<String, String> config) {
+		tolerance = Float.valueOf(config.get("tolerance"));
+		dataInput = new ArrayBlockingQueue<InputData>(50);
+		inputConnection = new LeapMotionConnection(this);
+		if(config.get("input").equals("leapmotion"))
+			inputConnection = new LeapMotionConnection(this);
+		else if(config.get("input").equals("glove"))
+			inputConnection = new GloveConnection(this, config.get("glovePort"));
+		close = false;
+		semafor = new Object();
+		serial = new HandConnection(config.get("port"), this);
+	}
+
 	public synchronized float getTolerance() {
 		return this.tolerance;
 	}
-	
-	 public synchronized void setTolerance(float tolerance) {
-		 this.tolerance = tolerance;
-	 }
+
+	public synchronized void setTolerance(float tolerance) {
+		this.tolerance = tolerance;
+	}
 
 	public void receiveData(InputData data) {
 		synchronized (semafor) {
@@ -48,15 +62,16 @@ public class HandController implements Runnable{
 	}
 
 	public void run() {
-		Thread leap = new Thread(leapMotion);
-		leap.start();
-		while(!close) {
-			if(!dataInput.isEmpty()) {
-				if(true/*serial.checkReady()*/) {
+		Thread input = new Thread(inputConnection);
+		input.start();
+		while (!close) {
+			if (!dataInput.isEmpty()) {
+				if (serial.checkReady()) {
 					try {
 						System.out.println(dataInput.take());
-//						SerialData data = dataInput.take().getSerialData();
-//						serial.send(data);
+						SerialData data = dataInput.take().getSerialData();
+						System.out.println(data.toString());
+						serial.send(data);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -70,11 +85,52 @@ public class HandController implements Runnable{
 				}
 			}
 		}
-		leapMotion.stop();
 	}
-	
+
 	public static void main(String[] args) {
-		HandController controller = new HandController();
+		HashMap<String, String> config = new HashMap<>();
+		
+		for (int i = 0; i < args.length; i++) {
+			switch (args[i]) {
+			case "-leapmotion":
+				config.put("input", "leapmotion");
+				break;
+			case "-t":
+				try {
+					String t = args[i+1];
+					config.put("tolerance", t);
+					i++;
+				}catch(IndexOutOfBoundsException indexEx) {
+					System.out.println("Missing tolerance number");
+					config.put("tolerance", "0.1");
+				}
+				break;
+			case "-glove":
+				config.put("input", "glove");
+				try {
+					String t = args[i+1];
+					config.put("glovePort", t);
+					i++;
+				}catch(IndexOutOfBoundsException indexEx) {
+					System.out.println("Missing glove port identifier");
+					config.put("glovePort", "6");
+				}
+				break;
+			case "-c":
+				try {
+					String c = "COM" + args[i+1];
+					config.put("port", c);
+					i++;
+				}catch(IndexOutOfBoundsException indexEx) {
+					System.out.println("Missing port identifier");
+
+					config.put("port", "COM7");
+				}
+				break;
+			default:
+			}
+		}
+		HandController controller = new HandController(config);
 		controller.run();
 	}
 }

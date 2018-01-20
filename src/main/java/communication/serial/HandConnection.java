@@ -43,7 +43,7 @@ public class HandConnection extends SerialConnection {
 	}
 	
 	public void send(SerialData data) {
-		this.send(data.toString());
+		this.send(data.toBytes());
 	}
 
 
