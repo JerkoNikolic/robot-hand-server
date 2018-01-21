@@ -18,7 +18,7 @@ public class HandController implements Runnable {
 	private Runnable inputConnection;
 	private GloveConnection glove;
 	private boolean close;
-	private Object semafor;
+	public Object semafor;
 
 	public HandController() {
 		this.tolerance = 0.15f;
@@ -66,9 +66,10 @@ public class HandController implements Runnable {
 		input.start();
 		while (!close) {
 			if (!dataInput.isEmpty()) {
+				System.out.println(dataInput.peek());
 				if (serial.checkReady()) {
 					try {
-						System.out.println(dataInput.take());
+						
 						SerialData data = dataInput.take().getSerialData();
 						System.out.println(data.toString());
 						serial.send(data);

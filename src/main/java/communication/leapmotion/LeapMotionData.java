@@ -38,7 +38,6 @@ public class LeapMotionData implements InputData {
  * If there is a difference between this data and the newData exceeding the tolerance in any parameter returns true
  */
 	public boolean checkForDifference(LeapMotionData newData, float tolerance) {
-		//TODO
 		if(fingerPosition==null)
 			return true;
 		boolean flag = false;
@@ -66,8 +65,8 @@ public class LeapMotionData implements InputData {
 	}
 
 	public SerialData getSerialData() {
-		// TODO Auto-generated method stub
-		return null;
+		SerialData data = new SerialData();
+		return data;
 	}
 
 }

@@ -11,6 +11,11 @@ public class HandConnection extends SerialConnection {
 									//the movement is performed
 	public HandConnection(String portName, HandController controller) {
 		super(portName);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		writeFlag = true;
 		this.controller = controller;
 	}
@@ -19,10 +24,13 @@ public class HandConnection extends SerialConnection {
 	public void serialEvent(SerialPortEvent event) {
 		if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 			try {
-				String inputLine=input.readLine();
-				if(inputLine.equals("r")) {
+				int inputLine=input.read();
+				if(inputLine==114) {
+					System.out.println("Movement performed");
 					this.writeFlag=true;
-					this.controller.notify();
+					synchronized (this.controller.semafor) {
+						this.controller.semafor.notify();
+					}
 				}
 			} catch (Exception e) {
 				System.out.println("Error receiving serial data");
