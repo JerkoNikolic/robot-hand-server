@@ -131,6 +131,7 @@ public class GloveConnection implements SerialPortEventListener, Runnable{
 				*/
 				
 				GloveData gloveData = new GloveData(fingerResistance, magData, accData, fingersMax, fingersMin);
+				System.out.println(gloveData.getSerialData().toString());
 				handController.receiveData(gloveData);
 			} catch (Exception e) {
 				e.printStackTrace();

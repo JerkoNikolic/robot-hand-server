@@ -30,7 +30,8 @@ public class HandController implements Runnable {
 	}
 	
 	public HandController(Map<String, String> config) {
-		tolerance = Float.valueOf(config.get("tolerance"));
+		//tolerance = Float.valueOf(config.get("tolerance"));
+		tolerance=0.1f;
 		dataInput = new ArrayBlockingQueue<InputData>(50);
 		inputConnection = new LeapMotionConnection(this);
 		if(config.get("input").equals("leapmotion"))
