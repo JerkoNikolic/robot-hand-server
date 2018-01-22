@@ -111,11 +111,11 @@ public class HandController implements Runnable {
 				config.put("input", "glove");
 				try {
 					String t = args[i+1];
-					config.put("glovePort", t);
+					config.put("glovePort","COM" + t);
 					i++;
 				}catch(IndexOutOfBoundsException indexEx) {
 					System.out.println("Missing glove port identifier");
-					config.put("glovePort", "6");
+					config.put("glovePort", "COM6");
 				}
 				break;
 			case "-c":

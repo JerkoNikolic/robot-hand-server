@@ -55,6 +55,7 @@ public class GloveConnection implements SerialPortEventListener, Runnable{
 			fingersMin[i]=Integer.MAX_VALUE;
 			fingersMax[i]=0;
 		}
+		this.initializeGlovePort();
 	}
 	
 	public void initializeGlovePort() {
