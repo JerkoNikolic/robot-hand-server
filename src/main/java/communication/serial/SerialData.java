@@ -9,8 +9,8 @@ public class SerialData {
 		baseMotorPosition = new HashMap<Integer, Integer>(5);
 		tipMotorPosition = new HashMap<Integer, Integer>(5);
 		for(int i = 0; i<5; i++) {
-			baseMotorPosition.put(i, 0);
-			tipMotorPosition.put(i, 0);
+			baseMotorPosition.put(i, 65);
+			tipMotorPosition.put(i, 65);
 		}
 	}
 	
@@ -31,9 +31,10 @@ public class SerialData {
 	
 	public byte[] toBytes() {
 		byte[] data = new byte[12];
-		for(int i=1; i<11; i++) {
-			data[i]=this.baseMotorPosition.get(i).byteValue();
-			data[++i]=this.tipMotorPosition.get(i-1).byteValue();
+		data[0]=(byte)255;
+		for(int i=0, j=1; i<5; i++) {
+			data[j++]=(byte)((int)this.tipMotorPosition.get(i));
+			data[j++]=(byte)((int)this.baseMotorPosition.get(i));
 		}
 		data[11]=(byte) 200;
 		return data;
